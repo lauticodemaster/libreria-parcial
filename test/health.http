@@ -1,0 +1,12 @@
+# Rutas de salud. Se ejecutan con la extensión REST Client de VS Code
+# (o cualquier cliente que lea archivos .http).
+@base = http://localhost:8000
+
+### Vivo: no toca la base
+# Esperado: 200 {"estado": "vivo"}
+GET {{base}}/health/live
+
+### Listo: ejecuta SELECT 1 contra la base
+# Esperado: 200 {"estado": "listo", "base": "ok"}
+#           (503 {"estado": "no listo", ...} si la base no responde)
+GET {{base}}/health/ready

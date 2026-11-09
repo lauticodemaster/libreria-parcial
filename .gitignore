@@ -1,0 +1,17 @@
+# Secretos: el .env nunca se versiona (sí el env.example).
+.env
+*.env
+!env.example
+
+# Entorno virtual y archivos generados por Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editores y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
