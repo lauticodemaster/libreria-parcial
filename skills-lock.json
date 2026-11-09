@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "skills": {
+    "active-orchestrator": {
+      "source": "Group-Active-IA/active-orchestrator",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "7b96f1d16190168b3d942b2aa2ce071a98ef1261e067bdf9277b0f6362280e3c",
+      "installMode": "copy"
+    },
+    "agents-md-generator": {
+      "source": "JuanCruzRobledo/agent-instruction",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "02206ef607617165b6b0ed8044b4912d072fd74dc6d74c9ea9e13c3b49ae5c30",
+      "installMode": "copy"
+    },
+    "discovery-research": {
+      "source": "Group-Active-IA/discovery-research",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "e8118732bfcd4b81311133a4f654785da3e35f3266bd1366a124e9dc7818739c",
+      "installMode": "copy"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "913b9d37d0d54047dd65222bb8c67b2bf04e3cb87dcad1729068d7a8b2c8c396",
+      "installMode": "copy"
+    },
+    "kb-creator": {
+      "source": "Group-Active-IA/kb-creator",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "166d9e4433ef0a98948fdaf39abd0a21319c2176c52469154fd4d232465ae755",
+      "installMode": "copy"
+    },
+    "roadmap-generator": {
+      "source": "Group-Active-IA/roadmap-generator",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "c0e4d897e161228d7d110db8ae8fec4065e9c88677eb6144494d784e27bb91b3",
+      "installMode": "copy"
+    },
+    "skill-registry": {
+      "source": "JuanCruzRobledo/skill-registry",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "1854b586700e3fe539d69ae4e7bae92b32de36ec9fedc472b7259c66403b90c5",
+      "installMode": "copy"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/tdd/SKILL.md",
+      "computedHash": "535d1a6f3bd5bded8971e7e4ea76538907cbff6b6d32c39cf97b669869dcd383",
+      "installMode": "copy"
+    },
+    "web-scraper": {
+      "source": "Group-Active-IA/web-scraper",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "c048a92a73411845ec7f497e6acbcad112a331e0a828b34a3a5da29d12f78a51",
+      "installMode": "copy"
+    }
+  }
+}

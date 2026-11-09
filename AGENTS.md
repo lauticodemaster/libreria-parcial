@@ -20,6 +20,8 @@ en https://libreria.saferazi.me con `docker run --env-file`.
 
 ## Base de Conocimiento
 
+Fuente: la consigna (`docs/consigna_parcial.pdf`) y el Discovery (`discovery/discovery.md`).
+
 | Archivo | Para qué |
 |---|---|
 | [knowledge-base/README.md](knowledge-base/README.md) | Índice y resumen ejecutivo |
@@ -44,7 +46,9 @@ Antes de codear revisá [10_preguntas_abiertas.md](knowledge-base/10_preguntas_a
 | Backend (apply) | Implementar o verificar tareas de un change con TDD | `tdd`, `openspec-apply-change` |
 | Planificación | Explorar, proponer y ajustar changes | `openspec-explore`, `openspec-propose`, `openspec-update-change` |
 | Cierre | Sincronizar specs y archivar | `openspec-sync-specs`, `openspec-archive-change` |
-| Fundación | KB, roadmap, instrucciones y skills | `kb-creator`, `roadmap-generator`, `agent-instruction`, `find-skill` |
+| Fundación | Discovery, KB, roadmap, instrucciones y skills | `active-orchestrator`, `discovery-research`, `web-scraper`, `kb-creator`, `roadmap-generator`, `agents-md-generator`, `find-skills`, `skill-registry` |
+
+> Todas las skills están **dentro del proyecto**, en `.claude/skills/` (las de la fundación, `tdd` y las de OpenSpec). `skills-lock.json` registra de qué repo salió cada una; se restauran con `npx skills experimental_install`. Los compact rules de cada skill los resuelve el orquestador desde `.atl/skill-registry.md`.
 
 Recomendadas por `find-skill` y **no instaladas**: `fastapi`,
 `fastapi-templates`, `python-testing-patterns`, `postgresql-table-design`, `postgresql-code-review`,
@@ -62,7 +66,7 @@ Ver [CHANGES.md](CHANGES.md). Cuatro changes en cadena, uno por integrante y por
 | C-04 | `ventas-docker-despliegue` | 4 | `ventas`, `contenedor-y-despliegue` | MEDIO (despliegue: ALTO) |
 
 El código ya existe y está probado: el `apply` de cada change verifica sus tareas contra el código y las
-pruebas (83/83; con las 16 pruebas estáticas del contenedor que sumó C-04, 99/99). El proyecto está desplegado en https://libreria.saferazi.me (servidor del grupo) y los casos D-01 a D-07 tienen su evidencia en `evidencia/`.
+pruebas (83/83; con las 23 pruebas estáticas del contenedor que sumó C-04, 106/106). El proyecto está desplegado en https://libreria.saferazi.me (servidor del grupo) y los casos D-01 a D-07 tienen su evidencia en `evidencia/`.
 
 ## Reglas Duras (específicas del proyecto)
 

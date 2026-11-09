@@ -4,7 +4,7 @@
 > Cada change es atómico y se corresponde 1 a 1 con el trabajo (y los commits) de una persona del equipo.
 > **Leer este archivo antes de ejecutar cualquier `/opsx:propose`.**
 
-> **Nota importante**: el código ya está implementado y probado (83 pruebas pytest, 83/83 en verde; el apply de C-04 sumó 16 pruebas estáticas del contenedor: 99/99).
+> **Nota importante**: el código ya está implementado y probado (83 pruebas pytest, 83/83 en verde; el apply de C-04 sumó pruebas estáticas del contenedor, hoy 23: 106/106).
 > Por eso, en cada change el `apply` **verifica las tareas contra el código y las pruebas existentes**
 > en lugar de escribir código nuevo; el objetivo es dejar documentado el trabajo de cada integrante
 > con specs, tareas y trazabilidad hacia la base de conocimiento.

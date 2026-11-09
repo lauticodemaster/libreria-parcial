@@ -1,7 +1,8 @@
 # Librería — Base de Conocimiento
 
-Base de conocimiento generada a partir de la consigna del parcial de Programación III (capítulos 1 a 4)
-y del código del proyecto.
+Base de conocimiento generada a partir de la consigna del parcial de Programación III (capítulos 1 a 4,
+`docs/consigna_parcial.pdf`) y del código del proyecto. El Discovery de la fundación está en
+`discovery/discovery.md` (problema, usuarios, casos de uso, reglas, restricciones, riesgos y preguntas abiertas).
 
 ## Índice de Archivos
 

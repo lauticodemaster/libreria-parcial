@@ -48,4 +48,4 @@ despliegue de una imagen de Docker en el VPS de la cátedra.
 - Los casos C-01 a C-08 dan el resultado esperado (`test/casos_minimos.http`).
 - El detalle de un libro y de una venta usa una cantidad fija de consultas (C-07).
 - El contenedor queda `healthy` en el VPS y los casos D-01 a D-07 tienen su evidencia (cumplido el 08/11/2026 en https://libreria.saferazi.me).
-- 99 pruebas automáticas aprobadas contra PostgreSQL 16 (83 de la API y 16 comprobaciones estáticas del contenedor).
+- 106 pruebas automáticas aprobadas contra PostgreSQL 16 (83 de la API y 23 comprobaciones estáticas del contenedor).
