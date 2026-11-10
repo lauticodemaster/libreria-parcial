@@ -1,0 +1,132 @@
+# Libros (con sus autorías) y clientes (con su perfil).
+# Antes de empezar: python -m app.seed (deja la base en el estado inicial conocido).
+@base = http://localhost:8000
+
+### Alta de libro con ids de editorial, género y autores (ejemplo de la consigna)
+# Esperado: 201 con el detalle: editorial Sudamericana, género Novela y
+#           autores Bioy Casares (coautor, 1) y Ocampo (coautor, 2)
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0006-6",
+  "titulo": "Los que aman, odian",
+  "precio": "21000.00",
+  "stock": 4,
+  "editorial_id": 1,
+  "genero_id": 1,
+  "autores": [
+    { "autor_id": 3, "rol": "coautor", "orden": 1 },
+    { "autor_id": 4, "rol": "coautor", "orden": 2 }
+  ]
+}
+
+### Alta con precio 0 (RN-03: lo valida el DTO)
+# Esperado: 422
+POST {{base}}/libros/
+Content-Type: application/json
+
+{ "isbn": "978-0-00-000000-1", "titulo": "Gratis", "precio": "0", "stock": 1, "editorial_id": 1 }
+
+### Alta con un rol que no existe
+# Esperado: 422
+POST {{base}}/libros/
+Content-Type: application/json
+
+{ "isbn": "978-0-00-000000-2", "titulo": "X", "precio": "100", "stock": 1, "editorial_id": 1,
+  "autores": [ { "autor_id": 1, "rol": "editor", "orden": 1 } ] }
+
+### Listado con editorial y género
+# Esperado: 200 con los libros, cada uno con "editorial" y "genero" (null en la Antología)
+GET {{base}}/libros/
+
+### Búsqueda por parte del título, sin distinguir mayúsculas
+# Esperado: 200 [Rayuela]
+GET {{base}}/libros/?titulo=RAYU
+
+### Filtro por género
+# Esperado: 200 con Bestiario y Ficciones
+GET {{base}}/libros/?genero_id=2
+
+### Detalle del libro con editorial, género y autores
+# Esperado: 200; autores Borges (1), Ocampo (2) y Bioy Casares (3), todos coautores
+GET {{base}}/libros/6
+
+### PATCH parcial: sólo el precio
+# Esperado: 200 con precio "26000.00" y el resto igual
+PATCH {{base}}/libros/1
+Content-Type: application/json
+
+{ "precio": "26000.00" }
+
+### PATCH con stock negativo
+# Esperado: 422
+PATCH {{base}}/libros/1
+Content-Type: application/json
+
+{ "stock": -1 }
+
+### PATCH a una editorial que no existe
+# Esperado: 409 {"detail": "La editorial indicada no existe."}
+PATCH {{base}}/libros/1
+Content-Type: application/json
+
+{ "editorial_id": 999 }
+
+### Alta de cliente
+# Esperado: 201 {"id": 4, "nombre": "Marta Sosa", "email": "marta@example.com"}
+POST {{base}}/clientes/
+Content-Type: application/json
+
+{ "nombre": "Marta Sosa", "email": "marta@example.com" }
+
+### Email inválido
+# Esperado: 422
+POST {{base}}/clientes/
+Content-Type: application/json
+
+{ "nombre": "Sin arroba", "email": "marta.example.com" }
+
+### Cliente con su perfil (objeto, no lista)
+# Esperado: 200 {"id": 1, ..., "perfil": {"id": 1, "cliente_id": 1, "telefono": ..., "direccion": ...}}
+GET {{base}}/clientes/1
+
+### Cliente sin perfil
+# Esperado: 200 {"id": 2, "nombre": "Tomás Ríos", "email": "tomas@example.com", "perfil": null}
+GET {{base}}/clientes/2
+
+### Alta del perfil de Tomás
+# Esperado: 201 {"id": 2, "cliente_id": 2, "telefono": "11 5555-0000", "direccion": "Bulnes 456"}
+POST {{base}}/clientes/2/perfil
+Content-Type: application/json
+
+{ "telefono": "11 5555-0000", "direccion": "Bulnes 456" }
+
+### Perfil para un cliente que no existe
+# Esperado: 404 {"detail": "El cliente no existe."}
+POST {{base}}/clientes/999/perfil
+Content-Type: application/json
+
+{ "telefono": "11 5555-0000", "direccion": "Bulnes 456" }
+
+### PATCH parcial de cliente
+# Esperado: 200 {"id": 4, "nombre": "Marta Sosa de Ruiz", "email": "marta@example.com", "perfil": null}
+PATCH {{base}}/clientes/4
+Content-Type: application/json
+
+{ "nombre": "Marta Sosa de Ruiz" }
+
+### PATCH con el email de otro cliente
+# Esperado: 409 {"detail": "Ya existe un cliente con ese email."}
+PATCH {{base}}/clientes/4
+Content-Type: application/json
+
+{ "email": "ana@example.com" }
+
+### Ventas del cliente
+# Esperado: 200 [{"id": 1, "fecha": "...", "total": "22000.00"}]
+GET {{base}}/clientes/1/ventas
+
+### Ventas de un cliente inexistente
+# Esperado: 404 {"detail": "El cliente no existe."}
+GET {{base}}/clientes/999/ventas
