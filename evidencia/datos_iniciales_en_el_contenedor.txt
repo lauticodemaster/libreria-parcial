@@ -1,0 +1,10 @@
+Datos iniciales cargados dentro del contenedor (docker exec libreria python -m app.seed)
+Servidor saferazi (VPS del grupo): Ubuntu 26.04, Docker 29.7.2, base PostgreSQL 16 propia en el contenedor libreria-db. URL pública: https://libreria.saferazi.me. Desplegado el 08/11/2026 a las 23:42 (hora de Argentina).
+====================================================================================================
+
+$ docker exec libreria python -m app.seed
+Datos iniciales cargados: 3 editoriales, 3 géneros, 5 autores, 6 libros, 3 clientes y 1 venta.
+código de salida: 0
+
+$ docker exec libreria wget -qO- http://127.0.0.1:8000/health/live
+{"estado":"vivo"}

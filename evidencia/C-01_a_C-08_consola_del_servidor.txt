@@ -1,0 +1,129 @@
+Consola del servidor (SQL_ECHO=true) mientras se ejecutaban los casos C-01 a C-08
+Máquina del grupo: Windows 11, Python 3.12.10, PostgreSQL 16.2 local (puerto 54316), servidor uvicorn en http://localhost:8000. Generado el 08/11/2026. Sin Docker: ver evidencia/README.md.
+====================================================================================================
+
+INFO:     127.0.0.1:52119 - "GET /libros/abc HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:52119 - "GET /ventas/uno HTTP/1.1" 422 Unprocessable Entity
+2026-11-08 18:29:29,656 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,656 INFO sqlalchemy.engine.Engine INSERT INTO libro (isbn, titulo, precio, stock, editorial_id, genero_id) VALUES ($1::VARCHAR, $2::VARCHAR, $3::NUMERIC(10, 2), $4::INTEGER, $5::INTEGER, $6::INTEGER) RETURNING libro.id
+2026-11-08 18:29:29,656 INFO sqlalchemy.engine.Engine [generated in 0.00013s] ('978-950-00-0001-1', 'Rayuela (otra edición)', Decimal('26000.00'), 1, 1, None)
+2026-11-08 18:29:29,656 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     libreria.errores - Escritura rechazada por la restricción uq_libro_isbn
+INFO:     127.0.0.1:52119 - "POST /libros/ HTTP/1.1" 409 Conflict
+2026-11-08 18:29:29,664 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,664 INFO sqlalchemy.engine.Engine INSERT INTO cliente (nombre, email) VALUES ($1::VARCHAR, $2::VARCHAR) RETURNING cliente.id
+2026-11-08 18:29:29,664 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ('Otra Ana', 'ana@example.com')
+2026-11-08 18:29:29,666 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     libreria.errores - Escritura rechazada por la restricción uq_cliente_email
+INFO:     127.0.0.1:52119 - "POST /clientes/ HTTP/1.1" 409 Conflict
+2026-11-08 18:29:29,668 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,668 INFO sqlalchemy.engine.Engine INSERT INTO perfil_cliente (cliente_id, telefono, direccion) VALUES ($1::INTEGER, $2::VARCHAR, $3::VARCHAR) RETURNING perfil_cliente.id
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine [generated in 0.00016s] (1, '11 0000-0000', 'Otra dirección 123')
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     libreria.errores - Escritura rechazada por la restricción uq_perfil_cliente_cliente_id
+INFO:     127.0.0.1:52119 - "POST /clientes/1/perfil HTTP/1.1" 409 Conflict
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine INSERT INTO libro (isbn, titulo, precio, stock, editorial_id, genero_id) VALUES ($1::VARCHAR, $2::VARCHAR, $3::NUMERIC(10, 2), $4::INTEGER, $5::INTEGER, $6::INTEGER) RETURNING libro.id
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine [cached since 0.01564s ago] ('978-950-00-0099-9', 'Libro huérfano', Decimal('15000.00'), 2, 999, None)
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     libreria.errores - Escritura rechazada por la restricción libro_editorial_id_fkey
+INFO:     127.0.0.1:52119 - "POST /libros/ HTTP/1.1" 409 Conflict
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine INSERT INTO libro (isbn, titulo, precio, stock, editorial_id, genero_id) VALUES ($1::VARCHAR, $2::VARCHAR, $3::NUMERIC(10, 2), $4::INTEGER, $5::INTEGER, $6::INTEGER) RETURNING libro.id
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine [cached since 0.02038s ago] ('978-950-00-0098-8', 'Libro sin autor real', Decimal('15000.00'), 2, 1, None)
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine INSERT INTO libro_autor (libro_id, autor_id, rol, orden) VALUES ($1::INTEGER, $2::INTEGER, $3::VARCHAR, $4::INTEGER)
+2026-11-08 18:29:29,670 INFO sqlalchemy.engine.Engine [generated in 0.00011s] (9, 999, 'autor', 1)
+2026-11-08 18:29:29,684 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     libreria.errores - Escritura rechazada por la restricción libro_autor_autor_id_fkey
+INFO:     127.0.0.1:52119 - "POST /libros/ HTTP/1.1" 409 Conflict
+2026-11-08 18:29:29,685 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,688 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.precio 
+FROM libro 
+WHERE libro.id IN ($1::INTEGER, $2::INTEGER)
+2026-11-08 18:29:29,688 INFO sqlalchemy.engine.Engine [generated in 0.00018s] (1, 999)
+2026-11-08 18:29:29,688 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52119 - "POST /ventas/ HTTP/1.1" 409 Conflict
+2026-11-08 18:29:29,688 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,688 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.precio 
+FROM libro 
+WHERE libro.id IN ($1::INTEGER)
+2026-11-08 18:29:29,688 INFO sqlalchemy.engine.Engine [cached since 0.002744s ago] (1,)
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine INSERT INTO venta (cliente_id, fecha, total) VALUES ($1::INTEGER, $2::TIMESTAMP WITH TIME ZONE, $3::NUMERIC(12, 2)) RETURNING venta.id
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine [generated in 0.00010s] (999, datetime.datetime(2026, 11, 8, 21, 29, 29, 688515, tzinfo=datetime.timezone.utc), Decimal('25000.00'))
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     libreria.errores - Escritura rechazada por la restricción venta_cliente_id_fkey
+INFO:     127.0.0.1:52119 - "POST /ventas/ HTTP/1.1" 409 Conflict
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.precio 
+FROM libro 
+WHERE libro.id IN ($1::INTEGER, $2::INTEGER)
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine [cached since 0.009005s ago] (1, 4)
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine INSERT INTO venta (cliente_id, fecha, total) VALUES ($1::INTEGER, $2::TIMESTAMP WITH TIME ZONE, $3::NUMERIC(12, 2)) RETURNING venta.id
+2026-11-08 18:29:29,692 INFO sqlalchemy.engine.Engine [cached since 0.005747s ago] (2, datetime.datetime(2026, 11, 8, 21, 29, 29, 692181, tzinfo=datetime.timezone.utc), Decimal('77000.00'))
+2026-11-08 18:29:29,699 INFO sqlalchemy.engine.Engine INSERT INTO renglon_venta (venta_id, libro_id, cantidad, precio_unitario) SELECT p0::INTEGER, p1::INTEGER, p2::INTEGER, p3::NUMERIC(10, 2) FROM (VALUES ($1::INTEGER, $2::INTEGER, $3::INTEGER, $4::NUMERIC(10, 2), 0), ($5::INTEGER, $6::INTEGER, $7::INTEGER, $8::NUMERIC(10, 2), 1)) AS imp_sen(p0, p1, p2, p3, sen_counter) ORDER BY sen_counter RETURNING renglon_venta.id, renglon_venta.id AS id__1
+2026-11-08 18:29:29,699 INFO sqlalchemy.engine.Engine [generated in 0.00006s (insertmanyvalues) 1/1 (ordered)] (3, 1, 2, Decimal('25000.00'), 3, 4, 1, Decimal('27000.00'))
+2026-11-08 18:29:29,699 INFO sqlalchemy.engine.Engine COMMIT
+2026-11-08 18:29:29,703 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,705 INFO sqlalchemy.engine.Engine SELECT venta.id, venta.cliente_id, venta.fecha, venta.total, cliente_1.id AS id_1, cliente_1.nombre, cliente_1.email 
+FROM venta LEFT OUTER JOIN cliente AS cliente_1 ON cliente_1.id = venta.cliente_id 
+WHERE venta.id = $1::INTEGER
+2026-11-08 18:29:29,705 INFO sqlalchemy.engine.Engine [generated in 0.00011s] (3,)
+2026-11-08 18:29:29,708 INFO sqlalchemy.engine.Engine SELECT renglon_venta.venta_id, renglon_venta.id, renglon_venta.libro_id, renglon_venta.cantidad, renglon_venta.precio_unitario, libro_1.id, libro_1.isbn, libro_1.titulo, libro_1.precio, libro_1.stock, libro_1.editorial_id, libro_1.genero_id 
+FROM renglon_venta LEFT OUTER JOIN libro AS libro_1 ON libro_1.id = renglon_venta.libro_id 
+WHERE renglon_venta.venta_id IN ($1::INTEGER) ORDER BY renglon_venta.id
+2026-11-08 18:29:29,708 INFO sqlalchemy.engine.Engine [generated in 0.00014s] (3,)
+2026-11-08 18:29:29,708 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52119 - "POST /ventas/ HTTP/1.1" 201 Created
+2026-11-08 18:29:29,708 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.isbn, libro.titulo, libro.precio, libro.stock, libro.editorial_id, libro.genero_id, editorial_1.id AS id_1, editorial_1.nombre, editorial_1.pais, genero_1.id AS id_2, genero_1.nombre AS nombre_1 
+FROM libro LEFT OUTER JOIN editorial AS editorial_1 ON editorial_1.id = libro.editorial_id LEFT OUTER JOIN genero AS genero_1 ON genero_1.id = libro.genero_id 
+WHERE libro.id = $1::INTEGER
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [generated in 0.00017s] (1,)
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro_autor.libro_id, libro_autor.autor_id, libro_autor.rol, libro_autor.orden, autor_1.id, autor_1.nombre, autor_1.nacionalidad 
+FROM libro_autor LEFT OUTER JOIN autor AS autor_1 ON autor_1.id = libro_autor.autor_id 
+WHERE libro_autor.libro_id IN ($1::INTEGER) ORDER BY libro_autor.orden
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [generated in 0.00023s] (1,)
+INFO:     127.0.0.1:52119 - "GET /libros/1 HTTP/1.1" 200 OK
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.isbn, libro.titulo, libro.precio, libro.stock, libro.editorial_id, libro.genero_id, editorial_1.id AS id_1, editorial_1.nombre, editorial_1.pais, genero_1.id AS id_2, genero_1.nombre AS nombre_1 
+FROM libro LEFT OUTER JOIN editorial AS editorial_1 ON editorial_1.id = libro.editorial_id LEFT OUTER JOIN genero AS genero_1 ON genero_1.id = libro.genero_id 
+WHERE libro.id = $1::INTEGER
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [cached since 0.01212s ago] (6,)
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro_autor.libro_id, libro_autor.autor_id, libro_autor.rol, libro_autor.orden, autor_1.id, autor_1.nombre, autor_1.nacionalidad 
+FROM libro_autor LEFT OUTER JOIN autor AS autor_1 ON autor_1.id = libro_autor.autor_id 
+WHERE libro_autor.libro_id IN ($1::INTEGER) ORDER BY libro_autor.orden
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [cached since 0.006984s ago] (6,)
+INFO:     127.0.0.1:52119 - "GET /libros/6 HTTP/1.1" 200 OK
+2026-11-08 18:29:29,731 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT venta.id, venta.cliente_id, venta.fecha, venta.total, cliente_1.id AS id_1, cliente_1.nombre, cliente_1.email 
+FROM venta LEFT OUTER JOIN cliente AS cliente_1 ON cliente_1.id = venta.cliente_id 
+WHERE venta.id = $1::INTEGER
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.02901s ago] (1,)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT renglon_venta.venta_id, renglon_venta.id, renglon_venta.libro_id, renglon_venta.cantidad, renglon_venta.precio_unitario, libro_1.id, libro_1.isbn, libro_1.titulo, libro_1.precio, libro_1.stock, libro_1.editorial_id, libro_1.genero_id 
+FROM renglon_venta LEFT OUTER JOIN libro AS libro_1 ON libro_1.id = renglon_venta.libro_id 
+WHERE renglon_venta.venta_id IN ($1::INTEGER) ORDER BY renglon_venta.id
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.02654s ago] (1,)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52119 - "GET /ventas/1 HTTP/1.1" 200 OK
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT venta.id, venta.cliente_id, venta.fecha, venta.total, cliente_1.id AS id_1, cliente_1.nombre, cliente_1.email 
+FROM venta LEFT OUTER JOIN cliente AS cliente_1 ON cliente_1.id = venta.cliente_id 
+WHERE venta.id = $1::INTEGER
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.03333s ago] (3,)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT renglon_venta.venta_id, renglon_venta.id, renglon_venta.libro_id, renglon_venta.cantidad, renglon_venta.precio_unitario, libro_1.id, libro_1.isbn, libro_1.titulo, libro_1.precio, libro_1.stock, libro_1.editorial_id, libro_1.genero_id 
+FROM renglon_venta LEFT OUTER JOIN libro AS libro_1 ON libro_1.id = renglon_venta.libro_id 
+WHERE renglon_venta.venta_id IN ($1::INTEGER) ORDER BY renglon_venta.id
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.03092s ago] (3,)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52119 - "GET /ventas/3 HTTP/1.1" 200 OK
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-08 18:29:29,744 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.isbn, libro.titulo, libro.precio, libro.stock, libro.editorial_id, libro.genero_id, editorial_1.id AS id_1, editorial_1.nombre, editorial_1.pais, genero_1.id AS id_2, genero_1.nombre AS nombre_1 
+FROM libro LEFT OUTER JOIN editorial AS editorial_1 ON editorial_1.id = libro.editorial_id LEFT OUTER JOIN genero AS genero_1 ON genero_1.id = libro.genero_id 
+WHERE libro.titulo ILIKE $1::VARCHAR ESCAPE '\' ORDER BY libro.id 
+ LIMIT $2::INTEGER OFFSET $3::INTEGER
+2026-11-08 18:29:29,744 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ("%' OR '1'='1%", 20, 0)
+INFO:     127.0.0.1:52119 - "GET /libros/?titulo=%27%20OR%20%271%27%3D%271 HTTP/1.1" 200 OK
+2026-11-08 18:29:29,746 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     libreria.ventas - Comprobante de la venta 3 enviado a tomas@example.com (total $77000.00).

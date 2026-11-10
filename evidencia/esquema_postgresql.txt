@@ -1,0 +1,153 @@
+Esquema creado por create_all en PostgreSQL 16: columnas, UNIQUE, CHECK, claves foráneas e índices
+Máquina del grupo: Windows 11, Python 3.12.10, PostgreSQL 16.2 local (puerto 54316), servidor uvicorn en http://localhost:8000. Generado el 08/11/2026. Sin Docker: ver evidencia/README.md.
+====================================================================================================
+
+$ psql -d libreria -c "select version()"
+ PostgreSQL 16.2 on x86_64-pc-mingw64, compiled by gcc.exe (x86_64-posix-seh-rev2, Built by MinGW-W64 project) 12.2.0, 64-bit
+
+$ psql -d libreria -c '\d editorial'
+                                    Table "public.editorial"
+ Column |          Type          | Collation | Nullable |                Default                
+--------+------------------------+-----------+----------+---------------------------------------
+ id     | integer                |           | not null | nextval('editorial_id_seq'::regclass)
+ nombre | character varying(120) |           | not null | 
+ pais   | character varying(80)  |           | not null | 
+Indexes:
+    "editorial_pkey" PRIMARY KEY, btree (id)
+    "uq_editorial_nombre" UNIQUE CONSTRAINT, btree (nombre)
+Referenced by:
+    TABLE "libro" CONSTRAINT "libro_editorial_id_fkey" FOREIGN KEY (editorial_id) REFERENCES editorial(id)
+
+$ psql -d libreria -c '\d genero'
+                                   Table "public.genero"
+ Column |         Type          | Collation | Nullable |              Default               
+--------+-----------------------+-----------+----------+------------------------------------
+ id     | integer               |           | not null | nextval('genero_id_seq'::regclass)
+ nombre | character varying(80) |           | not null | 
+Indexes:
+    "genero_pkey" PRIMARY KEY, btree (id)
+    "uq_genero_nombre" UNIQUE CONSTRAINT, btree (nombre)
+Referenced by:
+    TABLE "libro" CONSTRAINT "libro_genero_id_fkey" FOREIGN KEY (genero_id) REFERENCES genero(id)
+
+$ psql -d libreria -c '\d autor'
+                                       Table "public.autor"
+    Column    |          Type          | Collation | Nullable |              Default              
+--------------+------------------------+-----------+----------+-----------------------------------
+ id           | integer                |           | not null | nextval('autor_id_seq'::regclass)
+ nombre       | character varying(120) |           | not null | 
+ nacionalidad | character varying(80)  |           | not null | 
+Indexes:
+    "autor_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "libro_autor" CONSTRAINT "libro_autor_autor_id_fkey" FOREIGN KEY (autor_id) REFERENCES autor(id)
+
+$ psql -d libreria -c '\d libro'
+                                       Table "public.libro"
+    Column    |          Type          | Collation | Nullable |              Default              
+--------------+------------------------+-----------+----------+-----------------------------------
+ id           | integer                |           | not null | nextval('libro_id_seq'::regclass)
+ isbn         | character varying(20)  |           | not null | 
+ titulo       | character varying(200) |           | not null | 
+ precio       | numeric(10,2)          |           | not null | 
+ stock        | integer                |           | not null | 
+ editorial_id | integer                |           | not null | 
+ genero_id    | integer                |           |          | 
+Indexes:
+    "libro_pkey" PRIMARY KEY, btree (id)
+    "ix_libro_editorial_id" btree (editorial_id)
+    "ix_libro_genero_id" btree (genero_id)
+    "uq_libro_isbn" UNIQUE CONSTRAINT, btree (isbn)
+Check constraints:
+    "ck_libro_precio_positivo" CHECK (precio > 0::numeric)
+    "ck_libro_stock_no_negativo" CHECK (stock >= 0)
+Foreign-key constraints:
+    "libro_editorial_id_fkey" FOREIGN KEY (editorial_id) REFERENCES editorial(id)
+    "libro_genero_id_fkey" FOREIGN KEY (genero_id) REFERENCES genero(id)
+Referenced by:
+    TABLE "libro_autor" CONSTRAINT "libro_autor_libro_id_fkey" FOREIGN KEY (libro_id) REFERENCES libro(id)
+    TABLE "renglon_venta" CONSTRAINT "renglon_venta_libro_id_fkey" FOREIGN KEY (libro_id) REFERENCES libro(id)
+
+$ psql -d libreria -c '\d libro_autor'
+                    Table "public.libro_autor"
+  Column  |         Type          | Collation | Nullable | Default 
+----------+-----------------------+-----------+----------+---------
+ libro_id | integer               |           | not null | 
+ autor_id | integer               |           | not null | 
+ rol      | character varying(20) |           | not null | 
+ orden    | integer               |           | not null | 
+Indexes:
+    "libro_autor_pkey" PRIMARY KEY, btree (libro_id, autor_id)
+    "ix_libro_autor_autor_id" btree (autor_id)
+Check constraints:
+    "ck_libro_autor_orden" CHECK (orden >= 1)
+    "ck_libro_autor_rol" CHECK (rol::text = ANY (ARRAY['autor'::character varying, 'coautor'::character varying, 'traductor'::character varying, 'ilustrador'::character varying]::text[]))
+Foreign-key constraints:
+    "libro_autor_autor_id_fkey" FOREIGN KEY (autor_id) REFERENCES autor(id)
+    "libro_autor_libro_id_fkey" FOREIGN KEY (libro_id) REFERENCES libro(id)
+
+$ psql -d libreria -c '\d cliente'
+                                    Table "public.cliente"
+ Column |          Type          | Collation | Nullable |               Default               
+--------+------------------------+-----------+----------+-------------------------------------
+ id     | integer                |           | not null | nextval('cliente_id_seq'::regclass)
+ nombre | character varying(120) |           | not null | 
+ email  | character varying(200) |           | not null | 
+Indexes:
+    "cliente_pkey" PRIMARY KEY, btree (id)
+    "uq_cliente_email" UNIQUE CONSTRAINT, btree (email)
+Referenced by:
+    TABLE "perfil_cliente" CONSTRAINT "perfil_cliente_cliente_id_fkey" FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+    TABLE "venta" CONSTRAINT "venta_cliente_id_fkey" FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+
+$ psql -d libreria -c '\d perfil_cliente'
+                                      Table "public.perfil_cliente"
+   Column   |          Type          | Collation | Nullable |                  Default                   
+------------+------------------------+-----------+----------+--------------------------------------------
+ id         | integer                |           | not null | nextval('perfil_cliente_id_seq'::regclass)
+ cliente_id | integer                |           | not null | 
+ telefono   | character varying(40)  |           | not null | 
+ direccion  | character varying(200) |           | not null | 
+Indexes:
+    "perfil_cliente_pkey" PRIMARY KEY, btree (id)
+    "uq_perfil_cliente_cliente_id" UNIQUE CONSTRAINT, btree (cliente_id)
+Foreign-key constraints:
+    "perfil_cliente_cliente_id_fkey" FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+
+$ psql -d libreria -c '\d venta'
+                                       Table "public.venta"
+   Column   |           Type           | Collation | Nullable |              Default              
+------------+--------------------------+-----------+----------+-----------------------------------
+ id         | integer                  |           | not null | nextval('venta_id_seq'::regclass)
+ cliente_id | integer                  |           | not null | 
+ fecha      | timestamp with time zone |           | not null | now()
+ total      | numeric(12,2)            |           | not null | 
+Indexes:
+    "venta_pkey" PRIMARY KEY, btree (id)
+    "ix_venta_cliente_id" btree (cliente_id)
+Check constraints:
+    "ck_venta_total_no_negativo" CHECK (total >= 0::numeric)
+Foreign-key constraints:
+    "venta_cliente_id_fkey" FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+Referenced by:
+    TABLE "renglon_venta" CONSTRAINT "renglon_venta_venta_id_fkey" FOREIGN KEY (venta_id) REFERENCES venta(id) ON DELETE CASCADE
+
+$ psql -d libreria -c '\d renglon_venta'
+                                    Table "public.renglon_venta"
+     Column      |     Type      | Collation | Nullable |                  Default                  
+-----------------+---------------+-----------+----------+-------------------------------------------
+ id              | integer       |           | not null | nextval('renglon_venta_id_seq'::regclass)
+ venta_id        | integer       |           | not null | 
+ libro_id        | integer       |           | not null | 
+ cantidad        | integer       |           | not null | 
+ precio_unitario | numeric(10,2) |           | not null | 
+Indexes:
+    "renglon_venta_pkey" PRIMARY KEY, btree (id)
+    "ix_renglon_venta_libro_id" btree (libro_id)
+    "uq_renglon_venta_venta_libro" UNIQUE CONSTRAINT, btree (venta_id, libro_id)
+Check constraints:
+    "ck_renglon_venta_cantidad_positiva" CHECK (cantidad > 0)
+    "ck_renglon_venta_precio_positivo" CHECK (precio_unitario > 0::numeric)
+Foreign-key constraints:
+    "renglon_venta_libro_id_fkey" FOREIGN KEY (libro_id) REFERENCES libro(id)
+    "renglon_venta_venta_id_fkey" FOREIGN KEY (venta_id) REFERENCES venta(id) ON DELETE CASCADE

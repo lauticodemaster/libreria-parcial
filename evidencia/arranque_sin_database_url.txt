@@ -1,0 +1,21 @@
+Arranque sin DATABASE_URL y con una base que no responde: el proceso termina con error (equivalente local de D-05)
+Máquina del grupo: Windows 11, Python 3.12.10, PostgreSQL 16.2 local (puerto 54316), servidor uvicorn en http://localhost:8000. Generado el 08/11/2026. Sin Docker: ver evidencia/README.md.
+====================================================================================================
+
+$ uvicorn app.main:app --host 0.0.0.0 --port 8001    # sin DATABASE_URL (sin .env y sin variable)
+    return await anext(self.gen)
+  File "libreria\app\main.py", line 46, in lifespan
+    configuracion = leer_configuracion()
+  File "libreria\app\core\config.py", line 29, in leer_configuracion
+    raise RuntimeError(
+RuntimeError: Falta la variable de entorno DATABASE_URL. El proyecto no trae una dirección de base por defecto: definila en .env o pasala con --env-file.
+
+ERROR:    Application startup failed. Exiting.
+código de salida: 3
+
+$ DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:59999/libreria uvicorn app.main:app --port 8001    # base que no responde
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+ERROR:    Application startup failed. Exiting.
+código de salida: 3

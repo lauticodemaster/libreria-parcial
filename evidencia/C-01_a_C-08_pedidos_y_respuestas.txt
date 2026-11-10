@@ -1,0 +1,254 @@
+Casos C-01 a C-08 (test/casos_minimos.http) ejecutados en orden, después de python -m app.seed
+Máquina del grupo: Windows 11, Python 3.12.10, PostgreSQL 16.2 local (puerto 54316), servidor uvicorn en http://localhost:8000. Generado el 08/11/2026. Sin Docker: ver evidencia/README.md.
+====================================================================================================
+
+### C-01 · Parámetro de ruta que no es entero
+$ curl -s -X GET 'http://localhost:8000/libros/abc'
+HTTP/1.1 422 Unprocessable Entity
+{
+  "detail": [
+    {
+      "type": "int_parsing",
+      "loc": [
+        "path",
+        "libro_id"
+      ],
+      "msg": "Input should be a valid integer, unable to parse string as an integer",
+      "input": "abc"
+    }
+  ]
+}
+-> esperado 422, obtenido 422: OK
+
+### C-01 · Lo mismo en otro recurso
+$ curl -s -X GET 'http://localhost:8000/ventas/uno'
+HTTP/1.1 422 Unprocessable Entity
+{
+  "detail": [
+    {
+      "type": "int_parsing",
+      "loc": [
+        "path",
+        "venta_id"
+      ],
+      "msg": "Input should be a valid integer, unable to parse string as an integer",
+      "input": "uno"
+    }
+  ]
+}
+-> esperado 422, obtenido 422: OK
+
+### C-02 · ISBN repetido (el de Rayuela)
+$ curl -s -X POST 'http://localhost:8000/libros/' -H 'Content-Type: application/json' -d '{"isbn": "978-950-00-0001-1", "titulo": "Rayuela (otra edición)", "precio": "26000.00", "stock": 1, "editorial_id": 1}'
+HTTP/1.1 409 Conflict
+{
+  "detail": "Ya existe un libro con ese ISBN."
+}
+-> esperado 409, obtenido 409: OK
+
+### C-02 · Email repetido (el de Ana Pérez)
+$ curl -s -X POST 'http://localhost:8000/clientes/' -H 'Content-Type: application/json' -d '{"nombre": "Otra Ana", "email": "ana@example.com"}'
+HTTP/1.1 409 Conflict
+{
+  "detail": "Ya existe un cliente con ese email."
+}
+-> esperado 409, obtenido 409: OK
+
+### C-03 · Segundo perfil para el mismo cliente (Ana ya tiene uno)
+$ curl -s -X POST 'http://localhost:8000/clientes/1/perfil' -H 'Content-Type: application/json' -d '{"telefono": "11 0000-0000", "direccion": "Otra dirección 123"}'
+HTTP/1.1 409 Conflict
+{
+  "detail": "El cliente ya tiene un perfil cargado."
+}
+-> esperado 409, obtenido 409: OK
+
+### C-04 · Libro con una editorial inexistente
+$ curl -s -X POST 'http://localhost:8000/libros/' -H 'Content-Type: application/json' -d '{"isbn": "978-950-00-0099-9", "titulo": "Libro huérfano", "precio": "15000.00", "stock": 2, "editorial_id": 999, "autores": [{"autor_id": 1, "rol": "autor", "orden": 1}]}'
+HTTP/1.1 409 Conflict
+{
+  "detail": "La editorial indicada no existe."
+}
+-> esperado 409, obtenido 409: OK
+
+### C-04 · Libro con un autor inexistente
+$ curl -s -X POST 'http://localhost:8000/libros/' -H 'Content-Type: application/json' -d '{"isbn": "978-950-00-0098-8", "titulo": "Libro sin autor real", "precio": "15000.00", "stock": 2, "editorial_id": 1, "autores": [{"autor_id": 999, "rol": "autor", "orden": 1}]}'
+HTTP/1.1 409 Conflict
+{
+  "detail": "Alguno de los autores indicados no existe."
+}
+-> esperado 409, obtenido 409: OK
+
+### C-05 · Venta con un libro inexistente
+$ curl -s -X POST 'http://localhost:8000/ventas/' -H 'Content-Type: application/json' -d '{"cliente_id": 2, "renglones": [{"libro_id": 1, "cantidad": 1}, {"libro_id": 999, "cantidad": 1}]}'
+HTTP/1.1 409 Conflict
+{
+  "detail": "No existe el libro con id 999."
+}
+-> esperado 409, obtenido 409: OK
+
+### C-05 · Venta con un cliente inexistente
+$ curl -s -X POST 'http://localhost:8000/ventas/' -H 'Content-Type: application/json' -d '{"cliente_id": 999, "renglones": [{"libro_id": 1, "cantidad": 1}]}'
+HTTP/1.1 409 Conflict
+{
+  "detail": "El cliente indicado no existe."
+}
+-> esperado 409, obtenido 409: OK
+
+### C-06 · Venta válida con dos renglones (ejemplo de la consigna)
+$ curl -s -X POST 'http://localhost:8000/ventas/' -H 'Content-Type: application/json' -d '{"cliente_id": 2, "renglones": [{"libro_id": 1, "cantidad": 2}, {"libro_id": 4, "cantidad": 1}]}'
+HTTP/1.1 201 Created
+{
+  "id": 3,
+  "fecha": "2026-11-08T21:29:29.692181Z",
+  "total": "77000.00",
+  "cliente": {
+    "id": 2,
+    "nombre": "Tomás Ríos",
+    "email": "tomas@example.com"
+  },
+  "renglones": [
+    {
+      "libro_id": 1,
+      "titulo": "Rayuela",
+      "cantidad": 2,
+      "precio_unitario": "25000.00",
+      "subtotal": "50000.00"
+    },
+    {
+      "libro_id": 4,
+      "titulo": "Respiración artificial",
+      "cantidad": 1,
+      "precio_unitario": "27000.00",
+      "subtotal": "27000.00"
+    }
+  ]
+}
+-> esperado 201, obtenido 201: OK
+
+### C-07 · Detalle de un libro con UN autor
+$ curl -s -X GET 'http://localhost:8000/libros/1'
+HTTP/1.1 200 OK
+{
+  "id": 1,
+  "isbn": "978-950-00-0001-1",
+  "titulo": "Rayuela",
+  "precio": "25000.00",
+  "stock": 10,
+  "editorial": {
+    "id": 1,
+    "nombre": "Sudamericana"
+  },
+  "genero": {
+    "id": 1,
+    "nombre": "Novela"
+  },
+  "autores": [
+    {
+      "autor_id": 1,
+      "nombre": "Julio Cortázar",
+      "rol": "autor",
+      "orden": 1
+    }
+  ]
+}
+-> esperado 200, obtenido 200: OK
+
+### C-07 · Detalle de un libro con TRES autores
+$ curl -s -X GET 'http://localhost:8000/libros/6'
+HTTP/1.1 200 OK
+{
+  "id": 6,
+  "isbn": "978-950-00-0010-0",
+  "titulo": "Antología de la literatura fantástica",
+  "precio": "30000.00",
+  "stock": 3,
+  "editorial": {
+    "id": 1,
+    "nombre": "Sudamericana"
+  },
+  "genero": null,
+  "autores": [
+    {
+      "autor_id": 5,
+      "nombre": "Jorge Luis Borges",
+      "rol": "coautor",
+      "orden": 1
+    },
+    {
+      "autor_id": 4,
+      "nombre": "Silvina Ocampo",
+      "rol": "coautor",
+      "orden": 2
+    },
+    {
+      "autor_id": 3,
+      "nombre": "Adolfo Bioy Casares",
+      "rol": "coautor",
+      "orden": 3
+    }
+  ]
+}
+-> esperado 200, obtenido 200: OK
+
+### C-07 · Detalle de una venta con UN renglón
+$ curl -s -X GET 'http://localhost:8000/ventas/1'
+HTTP/1.1 200 OK
+{
+  "id": 1,
+  "fecha": "2026-11-08T21:29:26.674592Z",
+  "total": "22000.00",
+  "cliente": {
+    "id": 1,
+    "nombre": "Ana Pérez",
+    "email": "ana@example.com"
+  },
+  "renglones": [
+    {
+      "libro_id": 3,
+      "titulo": "La invención de Morel",
+      "cantidad": 1,
+      "precio_unitario": "22000.00",
+      "subtotal": "22000.00"
+    }
+  ]
+}
+-> esperado 200, obtenido 200: OK
+
+### C-07 · Detalle de una venta con DOS renglones (la del caso C-06, id 3)
+$ curl -s -X GET 'http://localhost:8000/ventas/3'
+HTTP/1.1 200 OK
+{
+  "id": 3,
+  "fecha": "2026-11-08T21:29:29.692181Z",
+  "total": "77000.00",
+  "cliente": {
+    "id": 2,
+    "nombre": "Tomás Ríos",
+    "email": "tomas@example.com"
+  },
+  "renglones": [
+    {
+      "libro_id": 1,
+      "titulo": "Rayuela",
+      "cantidad": 2,
+      "precio_unitario": "25000.00",
+      "subtotal": "50000.00"
+    },
+    {
+      "libro_id": 4,
+      "titulo": "Respiración artificial",
+      "cantidad": 1,
+      "precio_unitario": "27000.00",
+      "subtotal": "27000.00"
+    }
+  ]
+}
+-> esperado 200, obtenido 200: OK
+
+### C-08 · Búsqueda por título con el texto ' OR '1'='1
+$ curl -s -X GET 'http://localhost:8000/libros/?titulo=%27%20OR%20%271%27%3D%271'
+HTTP/1.1 200 OK
+[]
+-> esperado 200, obtenido 200: OK
+
+RESULTADO test/casos_minimos.http: todos los casos dan el código esperado

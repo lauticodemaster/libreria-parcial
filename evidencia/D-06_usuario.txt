@@ -1,0 +1,13 @@
+Caso D-06: usuario del proceso dentro del contenedor (no es root)
+Servidor saferazi (VPS del grupo): Ubuntu 26.04, Docker 29.7.2, base PostgreSQL 16 propia en el contenedor libreria-db. URL pública: https://libreria.saferazi.me. Desplegado el 08/11/2026 a las 23:42 (hora de Argentina).
+====================================================================================================
+
+$ docker exec libreria id
+uid=100(libreria) gid=101(libreria) groups=101(libreria)
+
+$ docker exec libreria ps -o user,pid,args
+USER     PID   COMMAND
+libreria     1 {uvicorn} /usr/local/bin/python3.12 /usr/local/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+libreria    61 ps -o user,pid,args
+
+Resultado: el proceso corre como libreria (uid=100), no como root (uid=0).

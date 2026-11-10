@@ -1,0 +1,63 @@
+Caso C-07: consultas emitidas por el detalle de un libro y de una venta (consola con SQL_ECHO=true)
+Máquina del grupo: Windows 11, Python 3.12.10, PostgreSQL 16.2 local (puerto 54316), servidor uvicorn en http://localhost:8000. Generado el 08/11/2026. Sin Docker: ver evidencia/README.md.
+====================================================================================================
+
+Resumen: la cantidad de consultas es FIJA (2) y no crece con la cantidad de autores o de renglones.
+  joinedload (relaciones a uno) + selectinload (colecciones), declarados en la misma consulta.
+
+  GET /libros/1   Detalle de un libro con 1 autor (Rayuela)                                   -> 2 consultas
+  GET /libros/6   Detalle de un libro con 3 autores (Antología de la literatura fantástica)   -> 2 consultas
+  GET /ventas/1   Detalle de una venta con 1 renglón                                          -> 2 consultas
+  GET /ventas/3   Detalle de una venta con 2 renglones (la del caso C-06)                     -> 2 consultas
+
+### Detalle de un libro con 1 autor (Rayuela)
+$ curl -s http://localhost:8000/libros/1
+Respuesta: 200. Consultas SELECT emitidas: 2
+
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.isbn, libro.titulo, libro.precio, libro.stock, libro.editorial_id, libro.genero_id, editorial_1.id AS id_1, editorial_1.nombre, editorial_1.pais, genero_1.id AS id_2, genero_1.nombre AS nombre_1 
+FROM libro LEFT OUTER JOIN editorial AS editorial_1 ON editorial_1.id = libro.editorial_id LEFT OUTER JOIN genero AS genero_1 ON genero_1.id = libro.genero_id 
+WHERE libro.id = $1::INTEGER
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [generated in 0.00017s] (1,)
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro_autor.libro_id, libro_autor.autor_id, libro_autor.rol, libro_autor.orden, autor_1.id, autor_1.nombre, autor_1.nacionalidad 
+FROM libro_autor LEFT OUTER JOIN autor AS autor_1 ON autor_1.id = libro_autor.autor_id 
+WHERE libro_autor.libro_id IN ($1::INTEGER) ORDER BY libro_autor.orden
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [generated in 0.00023s] (1,)
+
+### Detalle de un libro con 3 autores (Antología de la literatura fantástica)
+$ curl -s http://localhost:8000/libros/6
+Respuesta: 200. Consultas SELECT emitidas: 2
+
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro.id, libro.isbn, libro.titulo, libro.precio, libro.stock, libro.editorial_id, libro.genero_id, editorial_1.id AS id_1, editorial_1.nombre, editorial_1.pais, genero_1.id AS id_2, genero_1.nombre AS nombre_1 
+FROM libro LEFT OUTER JOIN editorial AS editorial_1 ON editorial_1.id = libro.editorial_id LEFT OUTER JOIN genero AS genero_1 ON genero_1.id = libro.genero_id 
+WHERE libro.id = $1::INTEGER
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [cached since 0.01212s ago] (6,)
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine SELECT libro_autor.libro_id, libro_autor.autor_id, libro_autor.rol, libro_autor.orden, autor_1.id, autor_1.nombre, autor_1.nacionalidad 
+FROM libro_autor LEFT OUTER JOIN autor AS autor_1 ON autor_1.id = libro_autor.autor_id 
+WHERE libro_autor.libro_id IN ($1::INTEGER) ORDER BY libro_autor.orden
+2026-11-08 18:29:29,717 INFO sqlalchemy.engine.Engine [cached since 0.006984s ago] (6,)
+
+### Detalle de una venta con 1 renglón
+$ curl -s http://localhost:8000/ventas/1
+Respuesta: 200. Consultas SELECT emitidas: 2
+
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT venta.id, venta.cliente_id, venta.fecha, venta.total, cliente_1.id AS id_1, cliente_1.nombre, cliente_1.email 
+FROM venta LEFT OUTER JOIN cliente AS cliente_1 ON cliente_1.id = venta.cliente_id 
+WHERE venta.id = $1::INTEGER
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.02901s ago] (1,)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT renglon_venta.venta_id, renglon_venta.id, renglon_venta.libro_id, renglon_venta.cantidad, renglon_venta.precio_unitario, libro_1.id, libro_1.isbn, libro_1.titulo, libro_1.precio, libro_1.stock, libro_1.editorial_id, libro_1.genero_id 
+FROM renglon_venta LEFT OUTER JOIN libro AS libro_1 ON libro_1.id = renglon_venta.libro_id 
+WHERE renglon_venta.venta_id IN ($1::INTEGER) ORDER BY renglon_venta.id
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.02654s ago] (1,)
+
+### Detalle de una venta con 2 renglones (la del caso C-06)
+$ curl -s http://localhost:8000/ventas/3
+Respuesta: 200. Consultas SELECT emitidas: 2
+
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT venta.id, venta.cliente_id, venta.fecha, venta.total, cliente_1.id AS id_1, cliente_1.nombre, cliente_1.email 
+FROM venta LEFT OUTER JOIN cliente AS cliente_1 ON cliente_1.id = venta.cliente_id 
+WHERE venta.id = $1::INTEGER
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.03333s ago] (3,)
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine SELECT renglon_venta.venta_id, renglon_venta.id, renglon_venta.libro_id, renglon_venta.cantidad, renglon_venta.precio_unitario, libro_1.id, libro_1.isbn, libro_1.titulo, libro_1.precio, libro_1.stock, libro_1.editorial_id, libro_1.genero_id 
+FROM renglon_venta LEFT OUTER JOIN libro AS libro_1 ON libro_1.id = renglon_venta.libro_id 
+WHERE renglon_venta.venta_id IN ($1::INTEGER) ORDER BY renglon_venta.id
+2026-11-08 18:29:29,734 INFO sqlalchemy.engine.Engine [cached since 0.03092s ago] (3,)

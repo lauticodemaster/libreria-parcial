@@ -1,0 +1,40 @@
+Caso D-04: docker rm -f libreria y el mismo docker run otra vez; vuelve a estar healthy y los datos siguen
+Servidor saferazi (VPS del grupo): Ubuntu 26.04, Docker 29.7.2, base PostgreSQL 16 propia en el contenedor libreria-db. URL pública: https://libreria.saferazi.me. Desplegado el 08/11/2026 a las 23:42 (hora de Argentina).
+====================================================================================================
+
+$ docker rm -f libreria
+libreria
+$ docker run -d --name libreria -p 127.0.0.1:8090:8000 --restart unless-stopped --network libreria-net --env-file /home/saferazi/libreria/libreria.env libreria
+<id del contenedor nuevo>
+$ docker network connect easypanel libreria
+
+$ docker ps --filter name=^libreria
+NAMES         IMAGE                STATUS                    PORTS
+libreria      libreria             Up 43 seconds (healthy)   127.0.0.1:8090->8000/tcp
+libreria-db   postgres:16-alpine   Up 2 minutes              5432/tcp
+
+$ docker logs libreria
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     libreria - Tablas verificadas: create_all creó las que faltaban.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:36706 - "GET /health/ready HTTP/1.1" 200 OK
+
+$ curl -s https://libreria.saferazi.me/ventas/   (desde la PC del grupo)
+[
+  {
+    "id": 1,
+    "cliente": "Ana Pérez",
+    "total": "22000.00",
+    "renglones": 1
+  },
+  {
+    "id": 2,
+    "cliente": "Tomás Ríos",
+    "total": "77000.00",
+    "renglones": 2
+  }
+]
+
+Resultado: el contenedor nuevo vuelve a estar healthy y la venta 2 registrada en D-03 sigue en la base (vive en el volumen libreria-db-data, no en el contenedor). create_all no recreó ninguna tabla.

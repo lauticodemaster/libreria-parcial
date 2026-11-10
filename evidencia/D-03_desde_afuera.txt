@@ -1,0 +1,43 @@
+Caso D-03: desde afuera del VPS (PC del grupo), en la URL pública: /health/ready, /libros/ y POST /ventas/
+Servidor saferazi (VPS del grupo): Ubuntu 26.04, Docker 29.7.2, base PostgreSQL 16 propia en el contenedor libreria-db. URL pública: https://libreria.saferazi.me. Desplegado el 08/11/2026 a las 23:42 (hora de Argentina).
+====================================================================================================
+
+$ date   (desde la PC del grupo, fuera del VPS)
+08/11/2026 23:51:15 (hora de Argentina, UTC-3; 09/11/2026 02:51:15 UTC)
+
+$ curl -i https://libreria.saferazi.me/health/ready
+HTTP/1.1 200 OK
+Date: Mon, 09 Nov 2026 02:51:16 GMT
+Content-Type: application/json
+Content-Length: 30
+Connection: keep-alive
+Server: cloudflare
+
+{"estado":"listo","base":"ok"}
+
+
+$ curl -i https://libreria.saferazi.me/libros/
+HTTP/1.1 200 OK
+Date: Mon, 09 Nov 2026 02:51:17 GMT
+Content-Type: application/json
+Content-Length: 1028
+Connection: keep-alive
+Server: cloudflare
+
+[{"id":1,"isbn":"978-950-00-0001-1","titulo":"Rayuela","precio":"25000.00","stock":10,"editorial":{"id":1,"nombre":"Sudamericana"},"genero":{"id":1,"nombre":"Novela"}},
+{"id":2,"isbn":"978-950-00-0002-2","titulo":"Bestiario","precio":"18000.00","stock":8,"editorial":{"id":1,"nombre":"Sudamericana"},"genero":{"id":2,"nombre":"Cuento"}},
+{"id":3,"isbn":"978-950-00-0003-3","titulo":"La invención de Morel","precio":"22000.00","stock":5,"editorial":{"id":2,"nombre":"Emecé"},"genero":{"id":1,"nombre":"Novela"}},
+{"id":4,"isbn":"978-950-00-0004-4","titulo":"Respiración artificial","precio":"27000.00","stock":6,"editorial":{"id":3,"nombre":"Anagrama"},"genero":{"id":1,"nombre":"Novela"}},
+{"id":5,"isbn":"978-950-00-0005-5","titulo":"Ficciones","precio":"20000.00","stock":12,"editorial":{"id":2,"nombre":"Emecé"},"genero":{"id":2,"nombre":"Cuento"}},
+{"id":6,"isbn":"978-950-00-0010-0","titulo":"Antología de la literatura fantástica","precio":"30000.00","stock":3,"editorial":{"id":1,"nombre":"Sudamericana"},"genero":null}]
+
+
+$ curl -i -X POST https://libreria.saferazi.me/ventas/ -H 'Content-Type: application/json' -d '{"cliente_id": 2, "renglones": [{"libro_id": 1, "cantidad": 2}, {"libro_id": 4, "cantidad": 1}]}'
+HTTP/1.1 201 Created
+Date: Mon, 09 Nov 2026 02:51:18 GMT
+Content-Type: application/json
+Content-Length: 362
+Connection: keep-alive
+Server: cloudflare
+
+{"id":2,"fecha":"2026-11-09T02:51:17.735131Z","total":"77000.00","cliente":{"id":2,"nombre":"Tomás Ríos","email":"tomas@example.com"},"renglones":[{"libro_id":1,"titulo":"Rayuela","cantidad":2,"precio_unitario":"25000.00","subtotal":"50000.00"},{"libro_id":4,"titulo":"Respiración artificial","cantidad":1,"precio_unitario":"27000.00","subtotal":"27000.00"}]}

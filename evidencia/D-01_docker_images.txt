@@ -1,0 +1,17 @@
+Caso D-01: docker images con la imagen base y con la del proyecto
+Servidor saferazi (VPS del grupo): Ubuntu 26.04, Docker 29.7.2, base PostgreSQL 16 propia en el contenedor libreria-db. URL pública: https://libreria.saferazi.me. Desplegado el 08/11/2026 a las 23:42 (hora de Argentina).
+====================================================================================================
+
+$ docker pull python:3.12-alpine   (BuildKit la usó para construir pero no la deja etiquetada)
+$ docker images python:3.12-alpine
+IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
+python:3.12-alpine   e064671ca452       74.8MB         18.7MB        
+
+$ docker images libreria
+IMAGE             ID             DISK USAGE   CONTENT SIZE   EXTRA
+libreria:latest   cc2ced4e9fb2        250MB         57.9MB        
+
+$ grep FROM Dockerfile
+FROM python:3.12-alpine
+
+Resultado: python:3.12-alpine ocupa 74.8 MB en disco (DISK USAGE), por debajo de 100 MB, y el Dockerfile parte de ella.

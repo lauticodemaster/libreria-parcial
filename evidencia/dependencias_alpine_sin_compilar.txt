@@ -1,0 +1,79 @@
+Verificación de que requirements.txt se instala en Alpine (musl) sin compilar nada
+Máquina del grupo: Windows 11, Python 3.12.10, PostgreSQL 16.2 local (puerto 54316), servidor uvicorn en http://localhost:8000. Generado el 08/11/2026. Sin Docker: ver evidencia/README.md.
+====================================================================================================
+
+$ pip download --only-binary=:all: --platform musllinux_1_2_x86_64 --platform musllinux_1_1_x86_64 \
+      --python-version 3.12 --implementation cp --abi cp312 --abi abi3 --abi none -r requirements.txt
+$ pip download --no-deps --only-binary=:all: --platform musllinux_1_2_x86_64 --python-version 3.12 uvloop
+
+Resultado: 64 paquetes, todos como wheel ya compilado (--only-binary=:all: no permite
+fuentes). Los que tienen código nativo traen wheel para musllinux (la libc de Alpine), así que en
+python:3.12-alpine se instalan sin compilador:
+
+  asyncpg-0.32.0-cp312-cp312-musllinux_1_2_x86_64.whl
+  charset_normalizer-3.5.2-cp312-cp312-musllinux_1_2_x86_64.whl
+  fastar-0.12.0-cp312-cp312-musllinux_1_2_x86_64.whl
+  greenlet-3.5.6-cp312-cp312-musllinux_1_2_x86_64.whl
+  httptools-0.9.0-cp312-cp312-musllinux_1_2_x86_64.whl
+  markupsafe-3.0.4-cp312-cp312-musllinux_1_2_x86_64.whl
+  pydantic_core-2.50.4-cp312-cp312-musllinux_1_1_x86_64.whl
+  pyyaml-6.0.3-cp312-cp312-musllinux_1_2_x86_64.whl
+  rignore-0.8.1-cp312-cp312-musllinux_1_2_x86_64.whl
+  sqlalchemy-2.1.8-cp312-cp312-musllinux_1_2_x86_64.whl
+  uvloop-0.23.0-cp312-cp312-musllinux_1_2_x86_64.whl
+  watchfiles-1.3.0-cp310-abi3-musllinux_1_1_x86_64.whl
+  websockets-17.4-cp312-cp312-musllinux_1_2_x86_64.whl
+
+El resto son wheels de Python puro (py3-none-any):
+
+  agent_detector-2.0.0-py3-none-any.whl
+  annotated_doc-0.0.5-py3-none-any.whl
+  annotated_types-0.8.0-py3-none-any.whl
+  anyio-4.16.0-py3-none-any.whl
+  certifi-2026.10.23-py3-none-any.whl
+  click-8.5.1-py3-none-any.whl
+  colorama-0.4.6-py2.py3-none-any.whl
+  detect_installer-0.2.1-py3-none-any.whl
+  dnspython-2.9.2-py3-none-any.whl
+  email_validator-2.3.0-py3-none-any.whl
+  fastapi-0.162.2-py3-none-any.whl
+  fastapi_cli-0.0.32-py3-none-any.whl
+  fastapi_cloud_cli-0.27.1-py3-none-any.whl
+  googleapis_common_protos-1.76.0-py3-none-any.whl
+  h11-0.16.0-py3-none-any.whl
+  httpcore-1.0.9-py3-none-any.whl
+  httpcore2-2.16.0-py3-none-any.whl
+  httpx-0.28.1-py3-none-any.whl
+  httpx2-2.16.0-py3-none-any.whl
+  idna-3.20-py3-none-any.whl
+  jinja2-3.1.6-py3-none-any.whl
+  markdown_it_py-4.2.0-py3-none-any.whl
+  mdurl-0.1.2-py3-none-any.whl
+  opentelemetry_api-1.45.2-py3-none-any.whl
+  opentelemetry_exporter_http_transport-0.66b2-py3-none-any.whl
+  opentelemetry_exporter_otlp_common-0.66b2-py3-none-any.whl
+  opentelemetry_exporter_otlp_proto_common-1.45.2-py3-none-any.whl
+  opentelemetry_exporter_otlp_proto_http-1.45.2-py3-none-any.whl
+  opentelemetry_proto-1.45.2-py3-none-any.whl
+  opentelemetry_sdk-1.45.2-py3-none-any.whl
+  opentelemetry_semantic_conventions-0.66b2-py3-none-any.whl
+  protobuf-7.36.2-py3-none-any.whl
+  pydantic-2.14.3-py3-none-any.whl
+  pydantic_extra_types-2.11.1-py3-none-any.whl
+  pydantic_settings-2.16.2-py3-none-any.whl
+  pygments-2.21.0-py3-none-any.whl
+  python_dotenv-1.2.4-py3-none-any.whl
+  python_multipart-0.0.33-py3-none-any.whl
+  requests-2.34.2-py3-none-any.whl
+  rich-15.0.0-py3-none-any.whl
+  rich_toolkit-0.20.6-py3-none-any.whl
+  sentry_sdk-2.74.0-py3-none-any.whl
+  shellingham-1.5.4-py2.py3-none-any.whl
+  sqlmodel-0.0.48-py3-none-any.whl
+  starlette-1.10.0-py3-none-any.whl
+  truststore-0.10.5-py3-none-any.whl
+  typer-0.28.0-py3-none-any.whl
+  typing_extensions-4.16.0-py3-none-any.whl
+  typing_inspection-0.4.5-py3-none-any.whl
+  urllib3-2.8.0-py3-none-any.whl
+  uvicorn-0.54.0-py3-none-any.whl

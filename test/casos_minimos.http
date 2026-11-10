@@ -1,0 +1,140 @@
+# Casos de prueba mínimos C-01 a C-08 de la consigna.
+#
+# 1. Dejar la base en el estado inicial conocido:   python -m app.seed
+#    (en el contenedor: docker exec libreria python -m app.seed)
+# 2. Ejecutar los pedidos EN ORDEN, de arriba hacia abajo.
+# Para C-07, levantar el servidor con SQL_ECHO=true y mirar la consola.
+@base = http://localhost:8000
+
+### C-01 · Parámetro de ruta que no es entero
+# Esperado: 422 (lo rechaza FastAPI al validar el parámetro, sin ejecutar el handler)
+#   {"detail": [{"type": "int_parsing", "loc": ["path", "libro_id"], ...}]}
+GET {{base}}/libros/abc
+
+### C-01 · Lo mismo en otro recurso
+# Esperado: 422
+GET {{base}}/ventas/uno
+
+### C-02 · ISBN repetido (el de Rayuela)
+# Esperado: 409 {"detail": "Ya existe un libro con ese ISBN."}
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0001-1",
+  "titulo": "Rayuela (otra edición)",
+  "precio": "26000.00",
+  "stock": 1,
+  "editorial_id": 1
+}
+
+### C-02 · Email repetido (el de Ana Pérez)
+# Esperado: 409 {"detail": "Ya existe un cliente con ese email."}
+POST {{base}}/clientes/
+Content-Type: application/json
+
+{ "nombre": "Otra Ana", "email": "ana@example.com" }
+
+### C-03 · Segundo perfil para el mismo cliente (Ana ya tiene uno)
+# Esperado: 409 {"detail": "El cliente ya tiene un perfil cargado."}
+POST {{base}}/clientes/1/perfil
+Content-Type: application/json
+
+{ "telefono": "11 0000-0000", "direccion": "Otra dirección 123" }
+
+### C-04 · Libro con una editorial inexistente
+# Esperado: 409 {"detail": "La editorial indicada no existe."}
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0099-9",
+  "titulo": "Libro huérfano",
+  "precio": "15000.00",
+  "stock": 2,
+  "editorial_id": 999,
+  "autores": [ { "autor_id": 1, "rol": "autor", "orden": 1 } ]
+}
+
+### C-04 · Libro con un autor inexistente
+# Esperado: 409 {"detail": "Alguno de los autores indicados no existe."}
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0098-8",
+  "titulo": "Libro sin autor real",
+  "precio": "15000.00",
+  "stock": 2,
+  "editorial_id": 1,
+  "autores": [ { "autor_id": 999, "rol": "autor", "orden": 1 } ]
+}
+
+### C-05 · Venta con un libro inexistente
+# Esperado: 409 {"detail": "No existe el libro con id 999."}
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 2,
+  "renglones": [ { "libro_id": 1, "cantidad": 1 }, { "libro_id": 999, "cantidad": 1 } ]
+}
+
+### C-05 · Venta con un cliente inexistente
+# Esperado: 409 {"detail": "El cliente indicado no existe."}
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 999,
+  "renglones": [ { "libro_id": 1, "cantidad": 1 } ]
+}
+
+### C-06 · Venta válida con dos renglones (ejemplo de la consigna)
+# Esperado: 201
+#   {"id": 3, "fecha": "...Z", "total": "77000.00",
+#    "cliente": {"id": 2, "nombre": "Tomás Ríos", "email": "tomas@example.com"},
+#    "renglones": [
+#      {"libro_id": 1, "titulo": "Rayuela", "cantidad": 2, "precio_unitario": "25000.00", "subtotal": "50000.00"},
+#      {"libro_id": 4, "titulo": "Respiración artificial", "cantidad": 1, "precio_unitario": "27000.00", "subtotal": "27000.00"}]}
+# El id es 3 y no 2 (como en el ejemplo de la consigna) porque el alta rechazada
+# del caso C-05 con cliente inexistente ya consumió un número de la secuencia:
+# PostgreSQL no devuelve los números de una inserción que falló. Si este pedido
+# se ejecuta justo después de python -m app.seed, la venta sale con id 2.
+# En la consola, medio segundo después de la línea "POST /ventas/ 201"
+# (y después de otras peticiones: el aviso no bloquea al servidor):
+#   INFO: libreria.ventas - Comprobante de la venta 3 enviado a tomas@example.com (total $77000.00).
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 2,
+  "renglones": [
+    { "libro_id": 1, "cantidad": 2 },
+    { "libro_id": 4, "cantidad": 1 }
+  ]
+}
+
+### C-07 · Detalle de un libro con UN autor
+# Esperado: 200. En la consola (SQL_ECHO=true) se ven 2 consultas:
+#   1) SELECT libro ... JOIN editorial ... LEFT OUTER JOIN genero ... WHERE libro.id = $1
+#   2) SELECT libro_autor ... JOIN autor ... WHERE libro_autor.libro_id IN ($1)
+GET {{base}}/libros/1
+
+### C-07 · Detalle de un libro con TRES autores
+# Esperado: 200 y las MISMAS 2 consultas (no crece con la cantidad de autores)
+GET {{base}}/libros/6
+
+### C-07 · Detalle de una venta con UN renglón
+# Esperado: 200. En la consola se ven 2 consultas:
+#   1) SELECT venta ... JOIN cliente ... WHERE venta.id = $1
+#   2) SELECT renglon_venta ... JOIN libro ... WHERE renglon_venta.venta_id IN ($1)
+GET {{base}}/ventas/1
+
+### C-07 · Detalle de una venta con DOS renglones (la del caso C-06, id 3)
+# Esperado: 200 y las MISMAS 2 consultas (no crece con la cantidad de renglones)
+GET {{base}}/ventas/3
+
+### C-08 · Búsqueda por título con el texto ' OR '1'='1
+# Esperado: 200 [] (el texto viaja como parámetro ligado: se busca literalmente)
+GET {{base}}/libros/?titulo=%27%20OR%20%271%27%3D%271

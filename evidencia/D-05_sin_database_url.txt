@@ -1,0 +1,20 @@
+Caso D-05: la imagen corrida sin DATABASE_URL termina con error
+Servidor saferazi (VPS del grupo): Ubuntu 26.04, Docker 29.7.2, base PostgreSQL 16 propia en el contenedor libreria-db. URL pública: https://libreria.saferazi.me. Desplegado el 08/11/2026 a las 23:42 (hora de Argentina).
+====================================================================================================
+
+$ docker run --name libreria-sin-url libreria      # sin --env-file: no hay DATABASE_URL
+  File "/usr/local/lib/python3.12/contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+  File "/app/app/main.py", line 46, in lifespan
+    configuracion = leer_configuracion()
+  File "/app/app/core/config.py", line 29, in leer_configuracion
+    raise RuntimeError(
+RuntimeError: Falta la variable de entorno DATABASE_URL. El proyecto no trae una dirección de base por defecto: definila en .env o pasala con --env-file.
+
+ERROR:    Application startup failed. Exiting.
+$ docker inspect libreria-sin-url --format "estado={{.State.Status}} código de salida={{.State.ExitCode}}"
+estado=exited código de salida=3
+$ docker rm libreria-sin-url
+libreria-sin-url
+
+Resultado: el contenedor no queda sirviendo; termina con código 3 porque el proyecto no trae ninguna dirección de base por defecto.

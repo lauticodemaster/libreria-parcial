@@ -1,0 +1,40 @@
+# Secretos: nunca entran en la imagen (lo que se hornea en una capa queda para siempre).
+.env
+*.env
+
+# Entorno virtual, control de versiones y archivos generados
+.venv/
+venv/
+.git/
+.gitignore
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+
+# Lo que la imagen no necesita para correr
+tests/
+test/
+evidencia/
+*.md
+requirements-dev.txt
+pytest.ini
+.dockerignore
+Dockerfile
+.vscode/
+.idea/
+
+# Artefactos de OPSX, base de conocimiento y documentación: documentan el proyecto, no lo ejecutan
+openspec/
+knowledge-base/
+docs/
+discovery/
+CHANGES.md
+AGENTS.md
+CLAUDE.md
+DEPLOY.md
+
+# Herramientas de agente de la fundación: no van en la imagen
+.claude/
+.atl/
+.active-orchestrator-state.json
+skills-lock.json

@@ -1,0 +1,73 @@
+Caso D-07: docker logs libreria después de la venta de D-03: el aviso aparece después de la línea de la respuesta
+Servidor saferazi (VPS del grupo): Ubuntu 26.04, Docker 29.7.2, base PostgreSQL 16 propia en el contenedor libreria-db. URL pública: https://libreria.saferazi.me. Desplegado el 08/11/2026 a las 23:42 (hora de Argentina).
+====================================================================================================
+
+$ docker logs libreria
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     libreria - Tablas verificadas: create_all creó las que faltaban.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:33526 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42352 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56572 - "GET /health/live HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56046 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51904 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34174 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55382 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     libreria - Motor de base de datos cerrado.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1]
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     libreria - Tablas verificadas: create_all creó las que faltaban.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:43986 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     10.11.0.15:59526 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57162 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     10.11.0.15:43826 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     10.11.0.15:43826 - "GET /libros/ HTTP/1.1" 200 OK
+INFO:     10.11.0.15:43826 - "POST /ventas/ HTTP/1.1" 201 Created
+INFO:     libreria.ventas - Comprobante de la venta 2 enviado a tomas@example.com (total $77000.00).
+INFO:     10.11.0.15:47070 - "GET / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "POST / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "HEAD / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /storage/logs/laravel.log HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47090 - "GET /.ssh/id_ed25519 HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /docker-compose.yml HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /config.xml HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /_vti_pvt/service.pwd HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /.ssh/id_rsa HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /wp-admin/setup-config.php HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /.git/HEAD HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /.env HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /database_backup.sql HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /backup.zip HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /actuator/heapdump HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /api/.env HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /phpinfo.php HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /database.sql HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /config.php HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /.svn/wc.db HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /dump.sql HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /.vscode/sftp.json HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /user_secrets.yml HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /backup.tar.gz HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /.env.production HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47078 - "GET /server.key HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /backup.sql HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /.npmrc HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /secrets.json HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /.bash_history HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET / HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /.well-known/ucp HTTP/1.1" 404 Not Found
+INFO:     10.11.0.15:47070 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52614 - "GET /health/ready HTTP/1.1" 200 OK

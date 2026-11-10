@@ -1,0 +1,39 @@
+Reinicio del servidor sobre la misma base: create_all no recrea nada y los datos siguen (equivalente local de D-04)
+Máquina del grupo: Windows 11, Python 3.12.10, PostgreSQL 16.2 local (puerto 54316), servidor uvicorn en http://localhost:8000. Generado el 08/11/2026. Sin Docker: ver evidencia/README.md.
+====================================================================================================
+
+$ (servidor reiniciado sobre la misma base)
+Sentencias CREATE TABLE emitidas en este arranque: 0
+INFO:     libreria - Tablas verificadas: create_all creó las que faltaban.
+INFO:     Application startup complete.
+
+$ curl -s http://localhost:8000/health/ready
+{"estado":"listo","base":"ok"}
+
+$ curl -s http://localhost:8000/ventas/3
+{
+    "id": 3,
+    "fecha": "2026-11-08T21:29:29.692181Z",
+    "total": "77000.00",
+    "cliente": {
+        "id": 2,
+        "nombre": "Tomás Ríos",
+        "email": "tomas@example.com"
+    },
+    "renglones": [
+        {
+            "libro_id": 1,
+            "titulo": "Rayuela",
+            "cantidad": 2,
+            "precio_unitario": "25000.00",
+            "subtotal": "50000.00"
+        },
+        {
+            "libro_id": 4,
+            "titulo": "Respiración artificial",
+            "cantidad": 1,
+            "precio_unitario": "27000.00",
+            "subtotal": "27000.00"
+        }
+    ]
+}
