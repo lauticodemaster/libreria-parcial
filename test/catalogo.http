@@ -1,0 +1,117 @@
+# Editoriales, géneros y autores.
+# Antes de empezar: python -m app.seed (deja la base en el estado inicial conocido).
+@base = http://localhost:8000
+
+### Alta de editorial
+# Esperado: 201 {"id": 4, "nombre": "Siglo XXI", "pais": "Argentina"}
+POST {{base}}/editoriales/
+Content-Type: application/json
+
+{ "nombre": "Siglo XXI", "pais": "Argentina" }
+
+### Editorial con nombre repetido (UNIQUE en la base)
+# Esperado: 409 {"detail": "Ya existe una editorial con ese nombre."}
+POST {{base}}/editoriales/
+Content-Type: application/json
+
+{ "nombre": "Sudamericana", "pais": "Uruguay" }
+
+### Alta con id en el cuerpo (los DTO de alta no llevan id)
+# Esperado: 422
+POST {{base}}/editoriales/
+Content-Type: application/json
+
+{ "id": 99, "nombre": "Otra", "pais": "Chile" }
+
+### Listado paginado
+# Esperado: 200 con las editoriales 2 y 3
+GET {{base}}/editoriales/?limit=2&offset=1
+
+### limit fuera de rango (de 1 a 100)
+# Esperado: 422
+GET {{base}}/editoriales/?limit=101
+
+### Detalle
+# Esperado: 200 {"id": 1, "nombre": "Sudamericana", "pais": "Argentina"}
+GET {{base}}/editoriales/1
+
+### Detalle inexistente
+# Esperado: 404 {"detail": "La editorial no existe."}
+GET {{base}}/editoriales/999
+
+### PATCH parcial: sólo cambia el país
+# Esperado: 200 {"id": 4, "nombre": "Siglo XXI", "pais": "México"}
+PATCH {{base}}/editoriales/4
+Content-Type: application/json
+
+{ "pais": "México" }
+
+### PATCH con un nombre que ya existe
+# Esperado: 409 {"detail": "Ya existe una editorial con ese nombre."}
+PATCH {{base}}/editoriales/4
+Content-Type: application/json
+
+{ "nombre": "Emecé" }
+
+### Libros de la editorial
+# Esperado: 200 con Rayuela, Bestiario y la Antología
+GET {{base}}/editoriales/1/libros
+
+### Alta de género
+# Esperado: 201 {"id": 4, "nombre": "Poesía"}
+POST {{base}}/generos/
+Content-Type: application/json
+
+{ "nombre": "Poesía" }
+
+### Género repetido
+# Esperado: 409 {"detail": "Ya existe un género con ese nombre."}
+POST {{base}}/generos/
+Content-Type: application/json
+
+{ "nombre": "Novela" }
+
+### Listado de géneros
+# Esperado: 200 con Novela, Cuento, Ensayo y Poesía
+GET {{base}}/generos/
+
+### Libros del género Cuento
+# Esperado: 200 con Bestiario y Ficciones
+GET {{base}}/generos/2/libros
+
+### Libros de un género inexistente
+# Esperado: 404 {"detail": "El género no existe."}
+GET {{base}}/generos/999/libros
+
+### Alta de autor
+# Esperado: 201 {"id": 6, "nombre": "Juan José Saer", "nacionalidad": "Argentina"}
+POST {{base}}/autores/
+Content-Type: application/json
+
+{ "nombre": "Juan José Saer", "nacionalidad": "Argentina" }
+
+### Alta de autor inválida (falta la nacionalidad)
+# Esperado: 422
+POST {{base}}/autores/
+Content-Type: application/json
+
+{ "nombre": "Sin nacionalidad" }
+
+### Detalle de autor
+# Esperado: 200 {"id": 5, "nombre": "Jorge Luis Borges", "nacionalidad": "Argentina"}
+GET {{base}}/autores/5
+
+### PATCH parcial de autor
+# Esperado: 200 {"id": 6, "nombre": "Juan José Saer", "nacionalidad": "Argentina (Santa Fe)"}
+PATCH {{base}}/autores/6
+Content-Type: application/json
+
+{ "nacionalidad": "Argentina (Santa Fe)" }
+
+### Libros del autor, con rol y orden
+# Esperado: 200 [La invención de Morel (autor, 1), Antología... (coautor, 3)]
+GET {{base}}/autores/3/libros
+
+### Autor inexistente
+# Esperado: 404 {"detail": "El autor no existe."}
+GET {{base}}/autores/999
